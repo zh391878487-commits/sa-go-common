@@ -27,14 +27,14 @@ func GinMiddleware() gin.HandlerFunc {
 		ctx := otel.GetTextMapPropagator().Extract(c.Request.Context(), propagation.HeaderCarrier(c.Request.Header))
 		ctx, span := Tracer().Start(ctx, c.Request.Method+" "+c.FullPath())
 
+		defer span.End()
+
 		traceID := FromContext(ctx)
 		c.Set(TraceIDKey, traceID)
 		c.Header("X-Trace-Id", traceID)
 		c.Request = c.Request.WithContext(ctx)
 
 		c.Next()
-
-		span.End()
 	}
 }
 

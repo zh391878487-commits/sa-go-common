@@ -21,6 +21,9 @@ func FromContext(ctx context.Context) string {
 // （定时任务、外部异步回调）生成一条新链路的起点。traceID 必须是 32 位十六进制字符串
 // （如 workflow.SideEffect 确定性生成的值），非法值原样返回原 ctx。
 func WithTraceID(ctx context.Context, traceID string) context.Context {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	tid, err := trace.TraceIDFromHex(traceID)
 	if err != nil {
 		return ctx
